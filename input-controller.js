@@ -47,7 +47,11 @@ class InputController {
     attach(target, dontEnable = true) {
         this.target = target;
 
-        this.target.addEventListener('keydown', (e) => func(e))
+        this.target.addEventListener('keydown', (e) => {
+            if (this.currentButton !== e.codeKey) {
+                this.currentButton = e.keyCode;
+            }
+        })
         this.target.addEventListener('keyup', (e) => {
             if (this.currentButton !== e.codeKey) {
                 this.currentButton = e.keyCode;
