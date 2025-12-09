@@ -1,8 +1,13 @@
+function func(e) {
+    console.log('rtr')
+}
+
 class InputController {
     enabled = false;
     focused = false;
     ACTION_ACTIVATED = "input-controller:activate";
     ACTION_DEACTIVATED = "input-controller:deactivate";
+    currentButton = null;
 
     constructor() {
         this.target = null;
@@ -11,8 +16,6 @@ class InputController {
 
     bindActions(actionsToBind) {
         this.actionsToBind = Object.assign(this.actionsToBind, actionsToBind)
-
-        console.log(this.actionsToBind);
     }
 
     changeJump() {
@@ -27,50 +30,56 @@ class InputController {
         } else {
             delete this.actionsToBind["jump"]
         }
-
-        console.log(this.actionsToBind);
     }
 
     enableAction(actionName) {
         if (this.actionsToBind[actionName]) {
-            console.log("До:", this.actionsToBind[actionName].enabled);
             this.actionsToBind[actionName].enabled = true;
-            console.log("После:", this.actionsToBind[actionName].enabled);
         }
     }
 
     disableAction(actionName) {
         if (this.actionsToBind[actionName]) {
-            console.log("До:", this.actionsToBind[actionName].enabled);
             this.actionsToBind[actionName].enabled = false;
-            console.log("После:", this.actionsToBind[actionName].enabled);
         }
     }
 
     attach(target, dontEnable = true) {
-        if (!dontEnable) {
-            this.target = document.getElementById(target);
-            console.log(target);
+        this.target = target;
+
+        this.target.addEventListener('keydown', (e) => func(e))
+        this.target.addEventListener('keyup', (e) => {
+            if (this.currentButton !== e.codeKey) {
+                this.currentButton = e.keyCode;
+            }
+        })
+
+        if (dontEnable) {
+            this.target.blur();
         }
     }
 
     detach() {
-        console.log(`${this.target === document.getElementById('ball') ? 'Шар' : 'Квадрат'} откреплен`);
+        this.target.removeEventListener('keydown', (e) => {
+            if (this.currentButton !== e.codeKey) {
+                this.currentButton = e.keyCode;
+            }
+        });
+        this.target.removeEventListener('keyup', (e) => {
+            if (this.currentButton !== e.codeKey) {
+                this.currentButton = e.keyCode;
+            }
+        });
+
         this.target = null;
     }
 
     isActionActive(action) {
-        if (this.actionsToBind[action]) {
-            return this.actionsToBind[action].enabled
-        } else {
-            console.log('Нет данного свойства');
-        }
+        return this.actionsToBind[action].keys.includes(this.currentButton);
     }
 
     isKeyPressed(keyCode) {
-        res = false;
-        window.addEventListener("keydown", (e => e.key === keyCode ? res = true : res = false))
-        return res;
+        return this.currentButton === keyCode;
     }
 
     switchAction(action) {

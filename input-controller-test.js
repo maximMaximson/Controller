@@ -12,7 +12,6 @@
 
     const Controller = new InputController();
     const actions = Controller.getActions();
-    let selectedElement = ball;
 
     Controller.bindActions({
         "up": {
@@ -71,68 +70,23 @@
         document.dispatchEvent(new CustomEvent(Controller.ACTION_DEACTIVATED, { detail: actionName }))
     }
 
-    function attachElement(name) {
-        Controller.attach(name, false);
-    }
-
-    document.addEventListener('keydown', (e) => {
-        for (const action in actions) {
-            if (actions[action].keys.includes(e.keyCode) && actions[action].enabled && Controller.enabled) {
-                dispathActionActivated(action);
-            }
-        }
-    })
-
-    document.addEventListener('keyup', (e) => {
-        for (const action in actions) {
-            if (actions[action].keys.includes(e.keyCode) && actions[action].enabled && Controller.enabled) {
-                dispathActionDeactivated(action);
-            }
-        }
-    })
-
-    document.addEventListener(Controller.ACTION_ACTIVATED, (e) => {
-        if (!selectedElement && Controller.enabled) {
-            return;
-        }
-
-        const currentXPos = parseInt(selectedElement.style.left) || 0;
-        const currentYPos = parseInt(selectedElement.style.top) || 0;
-
-
-        switch (e.detail) {
-            case 'up':
-                selectedElement.style.top = (currentYPos - 10) + 'px';
-                break;
-            case 'down':
-                selectedElement.style.top = (currentYPos + 10) + 'px';
-                break;
-            case 'left':
-                selectedElement.style.left = (currentXPos - 10) + 'px';
-                break;
-            case 'right':
-                selectedElement.style.left = (currentXPos + 10) + 'px';
-                break;
-        }
-    })
-
-    document.addEventListener(Controller.ACTION_DEACTIVATED, () => {
-        if (Controller.enabled) {
-            console.log('Действие выключено');
-        }
-    })
-
     document.addEventListener('keydown', (e) => {
         if ((e.code === "Space") && Controller.enabled) {
             singleJump();
         }
 
+        for (const action in actions) {
+            if (Controller.isActionActive(action) && Controller.isKeyPressed(e.keyCode) && Controller.enabled) {
+                dispathActionActivated(action);
+            }
+        }
+
         function singleJump() {
-            if (isJumping || !selectedElement) {
+            if (isJumping || !Controller.getTarget()) {
                 return;
             }
 
-            const currentTopValue = parseInt(selectedElement.style.top) || 325;
+            const currentTopValue = parseInt(Controller.getTarget().style.top) || 325;
             isJumping = true;
             let pos = 0;
 
@@ -145,14 +99,14 @@
 
                 if (isMovingUp) {
                     pos += 5;
-                    selectedElement.style.top = (currentTopValue - pos) + 'px';
+                    Controller.getTarget().style.top = (currentTopValue - pos) + 'px';
 
                     if (pos >= 100) {
                         isMovingUp = false;
                     }
                 } else {
                     pos -= 5;
-                    selectedElement.style.top = (currentTopValue - pos) + 'px';
+                    Controller.getTarget().style.top = (currentTopValue - pos) + 'px';
 
                     if (pos <= 0) {
                         clearInterval(jumpInterval);
@@ -163,12 +117,48 @@
         }
     })
 
-    detachButton.onclick = () => {
-        if (Controller.enabled) {
-            Controller.detach();
-            detachButton.disabled = true;
-            selectedElement = null;
+    document.addEventListener('keyup', (e) => {
+        for (const action in actions) {
+            if (Controller.isActionActive(action) && Controller.isKeyPressed(e.keyCode) && Controller.enabled) {
+                dispathActionDeactivated(action);
+            }
         }
+    })
+
+    document.addEventListener(Controller.ACTION_ACTIVATED, (e) => {
+        if (!Controller.getTarget() && Controller.enabled) {
+            return;
+        }
+
+        const currentXPos = parseInt(Controller.getTarget().style.left) || 0;
+        const currentYPos = parseInt(Controller.getTarget().style.top) || 0;
+
+
+        switch (e.detail) {
+            case 'up':
+                Controller.getTarget().style.top = (currentYPos - 10) + 'px';
+                break;
+            case 'down':
+                Controller.getTarget().style.top = (currentYPos + 10) + 'px';
+                break;
+            case 'left':
+                Controller.getTarget().style.left = (currentXPos - 10) + 'px';
+                break;
+            case 'right':
+                Controller.getTarget().style.left = (currentXPos + 10) + 'px';
+                break;
+        }
+    })
+
+    document.addEventListener(Controller.ACTION_DEACTIVATED, () => {
+        if (Controller.enabled) {
+            console.log('Действие выключено');
+        }
+    })
+
+    detachButton.onclick = () => {
+        Controller.detach();
+        detachButton.disabled = true;
     }
 
     onButton.onclick = () => {
@@ -193,20 +183,13 @@
     }
 
     ball.onclick = () => {
-        if (Controller.enabled) {
-            attachElement('ball');
-            detachButton.disabled = false;
-            selectedElement = Controller.getTarget();
-        }
-
+        Controller.attach(ball, false);
+        detachButton.disabled = false;
     }
 
     square.onclick = () => {
-        if (Controller.enabled) {
-            attachElement('square');
-            detachButton.disabled = false;
-            selectedElement = Controller.getTarget();
-        }
+        Controller.attach(square, false);
+        detachButton.disabled = false;
     }
 
     changeButton.onclick = () => {
