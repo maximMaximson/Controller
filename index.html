@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" style="width: 100vw; height: 100vh; overflow: hidden;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InputController</title>
+</head>
+
+<body style="display: flex; flex-direction: column; gap: 15px; width: 100%; height: 100%;">
+    <h1 style="text-align: center;">Тест контроллера</h1>
+
+    <div id='test-area' style="position: relative; overflow: hidden; display:flex; align-self: center; justify-self: center; width: 80%; height: 40%; border: 5px solid red;">
+        <div id='ball' style="
+                cursor: pointer;
+                width: 50px; 
+                height: 50px; 
+                border-radius: 10000000px; 
+                background-color: blue;
+                position: absolute;
+                top: 325px;
+            ">
+        </div>
+        <div id='square' style="
+                cursor: pointer;
+                width: 50px; 
+                height: 50px; 
+                background-color: blue;
+                position: absolute;
+                bottom: 0;
+                left: 100px;
+                top: 325px;
+            ">
+        </div>
+    </div>
+
+    <div style="margin-top: 100px; display: flex; width: 100%; column-gap: 10px;">
+        <button style="width: 100%; height: 50px;" disabled id="detachButton">Открепить</button>
+        <button style="width: 100%; height: 50px;" id="onButton">Активация контроллера</button>
+        <button style="width: 100%; height: 50px;" disabled id="offButton">Деактивация контроллера</button>
+        <button style="width: 100%; height: 50px;" id="jumpBindButton">Прыжок</button>
+    </div>
+
+    <div style="display: flex; column-gap: 15px;">
+        <select id="selector" style="height: 25px;"></select>
+        <button id="changeButton" style="height: 25px;">Переключить</button>
+    </div>
+
+
+    <script src="input-controller.js"></script>
+    <script src="input-controller-test.js"></script>
+</body>
+
+</html>
