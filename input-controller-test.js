@@ -29,14 +29,6 @@
         }
     }, ball);
 
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            Controller.focused = false;
-        } else {
-            Controller.focused = true;
-        }
-    });
-
     function fillSelector() {
         const currentValue = selector.value;
         selector.innerHTML = '';

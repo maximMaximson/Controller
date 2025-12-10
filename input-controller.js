@@ -10,6 +10,12 @@ class InputController {
         this.actionsToBind = {};
         this.bindActions(actionsToBind);
         if (target) this.attach(target);
+
+        window.addEventListener('focus', () => this.focused = true);
+        window.addEventListener('blur', () => this.focused = false);
+        document.addEventListener('visibilitychange', () => {
+            this.focused = !document.hidden;
+        });
     }
 
     bindActions(actionsToBind) {
@@ -54,11 +60,13 @@ class InputController {
         this.target = target;
 
         this.keydownHandler = (e) => {
+            if (!this.enabled || !this.focused) return;
             this.currentButtons.add(e.keyCode);
             this.checkActions();
         }
 
         this.keyupHandler = (e) => {
+            if (!this.enabled || !this.focused) return;
             this.currentButtons.delete(e.keyCode);
             this.checkActions();
         }
@@ -94,6 +102,7 @@ class InputController {
         for (const actionName in this.actionsToBind) {
             const isActive = this.isActionActive(actionName);
             const action = this.actionsToBind[actionName];
+            if (!action.enabled) continue;
 
             if (isActive && !action._active) {
                 document.dispatchEvent(new CustomEvent(this.ACTION_ACTIVATED, { detail: actionName }));
