@@ -5,9 +5,11 @@ class InputController {
     ACTION_DEACTIVATED = "input-controller:deactivate";
     currentButtons = new Set();
 
-    constructor() {
+    constructor(actionsToBind = {}, target = null) {
         this.target = null;
         this.actionsToBind = {};
+        this.bindActions(actionsToBind);
+        if (target) this.attach(target);
     }
 
     bindActions(actionsToBind) {
@@ -41,6 +43,14 @@ class InputController {
     }
 
     attach(target, dontEnable = true) {
+        if (this.target === target) {
+            return;
+        }
+
+        if(this.target) {
+            this.detach();
+        }
+
         this.target = target;
 
         this.keydownHandler = (e) => {
@@ -83,13 +93,16 @@ class InputController {
 
         for (const actionName in this.actionsToBind) {
             const isActive = this.isActionActive(actionName);
+            const action = this.actionsToBind[actionName];
 
-            if (isActive) {
+            if (isActive && !action._active) {
                 document.dispatchEvent(new CustomEvent(this.ACTION_ACTIVATED, { detail: actionName }));
+                action._active = true;
             }
 
-            if (!isActive) {
+            if (!isActive && action._active) {
                 document.dispatchEvent(new CustomEvent(this.ACTION_DEACTIVATED, { detail: actionName }));
+                action._active = false;
             }
         }
     }

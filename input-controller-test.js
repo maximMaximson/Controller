@@ -10,9 +10,7 @@
 
     let isJumping = false;
 
-    const Controller = new InputController();
-
-    Controller.bindActions({
+    const Controller = new InputController({
         "up": {
             keys: [87, 38],
             enabled: true,
@@ -29,7 +27,7 @@
             keys: [68, 39],
             enabled: true,
         }
-    })
+    }, ball);
 
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
@@ -103,9 +101,11 @@
     })
 
     document.addEventListener(Controller.ACTION_ACTIVATED, (e) => {
-        if (!Controller.getTarget() && Controller.enabled) {
+        if (!Controller.enabled) {
             return;
         }
+
+        console.log('Действие включено');
 
         const currentXPos = parseInt(Controller.getTarget().style.left) || 0;
         const currentYPos = parseInt(Controller.getTarget().style.top) || 0;
@@ -142,6 +142,7 @@
         Controller.enabled = true;
         onButton.disabled = true;
         offButton.disabled = false;
+        Controller.getTarget().focus();
         console.log('Контроллер включен', Controller.enabled);
     }
 
