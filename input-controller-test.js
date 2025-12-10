@@ -11,7 +11,6 @@
     let isJumping = false;
 
     const Controller = new InputController();
-    const actions = Controller.getActions();
 
     Controller.bindActions({
         "up": {
@@ -62,23 +61,9 @@
 
     fillSelector();
 
-    function dispathActionActivated(actionName) {
-        document.dispatchEvent(new CustomEvent(Controller.ACTION_ACTIVATED, { detail: actionName }))
-    }
-
-    function dispathActionDeactivated(actionName) {
-        document.dispatchEvent(new CustomEvent(Controller.ACTION_DEACTIVATED, { detail: actionName }))
-    }
-
     document.addEventListener('keydown', (e) => {
         if ((e.code === "Space") && Controller.enabled) {
             singleJump();
-        }
-
-        for (const action in actions) {
-            if (Controller.isActionActive(action) && Controller.isKeyPressed(e.keyCode) && Controller.enabled) {
-                dispathActionActivated(action);
-            }
         }
 
         function singleJump() {
@@ -114,14 +99,6 @@
                     }
                 }
             }, 16)
-        }
-    })
-
-    document.addEventListener('keyup', (e) => {
-        for (const action in actions) {
-            if (Controller.isActionActive(action) && Controller.isKeyPressed(e.keyCode) && Controller.enabled) {
-                dispathActionDeactivated(action);
-            }
         }
     })
 
